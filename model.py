@@ -20,7 +20,7 @@ class AutoEncoder(pl.LightningModule):
         self.decoder = nn.Sequential(nn.Linear(3, 64), nn.ReLU(), nn.Linear(64, 28 * 28))
 
     def forward(self, x):
-        embedding = self.encoder()
+        embedding = self.encoder(x)
         return embedding
     
     def training_step(self, batch, batch_idx):
