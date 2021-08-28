@@ -17,5 +17,7 @@ train_dataloader = DataLoader(train_dataset)
 
 autoencoder = AutoEncoder()
 
-trainer = pl.Trainer()
+trainer = pl.Trainer(
+    gpus=-1
+)
 trainer.fit(autoencoder, train_dataloader)
