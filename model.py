@@ -16,8 +16,20 @@ import pytorch_lightning as pl
 class AutoEncoder(pl.LightningModule):
     def __init__(self):
         super().__init__()
-        self.encoder = nn.Sequential(nn.Linear(28 * 28, 64), nn.ReLU(), nn.Linear(64, 32))
-        self.decoder = nn.Sequential(nn.Linear(32, 64), nn.ReLU(), nn.Linear(64, 28 * 28))
+        self.encoder = nn.Sequential(
+            nn.Linear(28 * 28, 256),
+            nn.ReLU(),
+            nn.Linear(256, 64),
+            nn.ReLU(),
+            nn.Linear(64, 16)
+        )
+        self.decoder = nn.Sequential(
+            nn.Linear(16, 64),
+            nn.ReLU(),
+            nn.Linear(64, 256),
+            nn.ReLU(),
+            nn.Linear(256, 28 * 28),
+        )
 
     def forward(self, x):
         embedding = self.encoder(x)
