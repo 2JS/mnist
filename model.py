@@ -21,10 +21,10 @@ class AutoEncoder(pl.LightningModule):
             nn.ReLU(),
             nn.Linear(256, 64),
             nn.ReLU(),
-            nn.Linear(64, 16)
+            nn.Linear(64, 32)
         )
         self.decoder = nn.Sequential(
-            nn.Linear(16, 64),
+            nn.Linear(32, 64),
             nn.ReLU(),
             nn.Linear(64, 256),
             nn.ReLU(),
