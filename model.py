@@ -98,7 +98,7 @@ class ConvAutoEncoder(pl.LightningModule):
             nn.ConvTranspose2d(32, 16, kernel_size=3, stride=2, padding=1, output_padding=1),
             nn.ReLU(),
             # 16, 28, 28
-            nn.Conv2d(16, 1, kernel_size=3, padding=1, padding_mode='replicate')
+            nn.Conv2d(16, 1, kernel_size=3, padding=1, padding_mode='replicate'),
             # 1, 28, 28
         )
 
@@ -109,7 +109,7 @@ class ConvAutoEncoder(pl.LightningModule):
     def training_step(self, batch, batch_idx):
         x, y = batch
         z = self.encoder(x)
-        x_hat = self.decoder(z)
+        x_hat = F.leaky_relu_(1-F.leaky_relu_(1-self.decoder(z)))
         loss = F.mse_loss(x_hat, x)
         self.log('train loss', loss)
         return loss
@@ -117,7 +117,7 @@ class ConvAutoEncoder(pl.LightningModule):
     def validation_step(self, batch, batch_idx):
         x, y = batch
         z = self.encoder(x)
-        x_hat = self.decoder(z)
+        x_hat = F.leaky_relu_(1-F.leaky_relu_(1-self.decoder(z)))
         loss = F.mse_loss(x_hat, x)
         self.log('valid loss', loss)
 
