@@ -15,8 +15,8 @@ train_dataset = MNIST(root='data/', train=True, download=True, transform=ToTenso
 test_dataset = MNIST(root='data/', train=False, download=True, transform=ToTensor()
 )
 
-train_dataloader = DataLoader(train_dataset)
-test_dataloader = DataLoader(test_dataset)
+train_dataloader = DataLoader(train_dataset, batch_size=2**7)
+test_dataloader = DataLoader(test_dataset, batch_size=2**7)
 
 # autoencoder = AutoEncoder()
 classifier = Classifier()
