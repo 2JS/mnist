@@ -8,7 +8,7 @@ from torchvision.datasets import MNIST
 import pytorch_lightning as pl
 from pytorch_lightning.loggers import WandbLogger
 
-from model import AutoEncoder, Classifier
+from model import *
 
 train_dataset = MNIST(root='data/', train=True, download=True, transform=ToTensor()
 )
@@ -19,7 +19,7 @@ train_dataloader = DataLoader(train_dataset, batch_size=2**7)
 test_dataloader = DataLoader(test_dataset, batch_size=2**7)
 
 # autoencoder = AutoEncoder()
-classifier = Classifier()
+classifier = ConvClassifier()
 
 logger = WandbLogger(project='mnist', log_model='all')
 
