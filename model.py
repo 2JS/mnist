@@ -109,7 +109,7 @@ class ConvAutoEncoder(pl.LightningModule):
     def training_step(self, batch, batch_idx):
         x, y = batch
         z = self.encoder(x)
-        x_hat = F.leaky_relu_(1-F.leaky_relu_(1-self.decoder(z)))
+        x_hat = F.leaky_relu_(1-F.leaky_relu_(1-self.decoder(z), 0.1), 0.1)
         loss = F.mse_loss(x_hat, x)
         self.log('train loss', loss)
         return loss
@@ -117,10 +117,10 @@ class ConvAutoEncoder(pl.LightningModule):
     def validation_step(self, batch, batch_idx):
         x, y = batch
         z = self.encoder(x)
-        x_hat = F.leaky_relu_(1-F.leaky_relu_(1-self.decoder(z)))
+        x_hat = F.leaky_relu_(1-F.leaky_relu_(1-self.decoder(z), 0.1), 0.1)
         loss = F.mse_loss(x_hat, x)
         self.log('valid loss', loss)
 
     def configure_optimizers(self):
-        optimizer = torch.optim.Adam(self.parameters(), lr=1e-3)
+        optimizer = torch.optim.Adam(self.parameters(), lr=3e-4)
         return optimizer
