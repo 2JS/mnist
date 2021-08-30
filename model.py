@@ -1,16 +1,102 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import torchmetrics
+import torchmetrics as metrics
 import pytorch_lightning as pl
 
 
-# class Classifier(pl.LightningModule):
-#     def __init__(self):
-#         super().__init__()
-#         self.layers = nn.Sequential(
-#             nn.Linear(28*28, 64), nn.ReLU(), nn.Linear(64, 3)
-#         )
+class Classifier(pl.LightningModule):
+    def __init__(self):
+        super().__init__()
+        self.layers = nn.Sequential(
+            nn.Linear(28*28, 64), nn.ReLU(),
+            nn.Linear(64, 32), nn.ReLU(),
+            nn.Linear(32, 10), nn.Softmax()
+        )
+        self.train_acc = metrics.Accuracy(compute_on_step=False)
+        self.valid_acc = metrics.Accuracy(compute_on_step=False)
+
+    def forward(self, x):
+        logits = self.layers(x)
+        return logits
+
+    def training_step(self, batch, batch_idx):
+        x, y = batch
+        x = x.view(x.shape[0], -1)
+        logits = self(x)
+        loss = F.cross_entropy(logits, y)
+        self.log('train loss', loss)
+        self.train_acc(logits, y)
+        return loss
+
+    def training_epoch_end(self, outputs):
+        self.log('train accuracy', self.train_acc.compute())
+        self.train_acc.reset()
+
+    def validation_step(self, batch, batch_idx):
+        x, y = batch
+        x = x.view(x.shape[0], -1)
+        logits = self(x)
+        loss = F.cross_entropy(logits, y)
+        self.log('valid loss', loss)
+        self.valid_acc(logits, y)
+
+    def validation_epoch_end(self, outputs):
+        self.log('valid accuracy', self.valid_acc.compute())
+        self.valid_acc.reset()
+
+    def configure_optimizers(self):
+        return torch.optim.AdamW(self.parameters(), lr=3e-4)
+
+class ConvClassifier(pl.LightningModule):
+    def __init__(self):
+        super().__init__()
+        self.layers = nn.Sequential(
+            nn.Conv2d(1, 32, kernel_size=3, stride=1, padding=1),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2, stride=2),
+
+            nn.Conv2d(32, 64, kernel_size=3, stride=1, padding=1),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2, stride=2),
+
+            nn.Conv2d(64, 128, kernel_size=3, stride=1, padding=1),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2, stride=2, padding=1),
+
+            nn.Flatten(),
+            nn.Linear(2048, 512),
+            nn.Linear(512, 10),
+        )
+        self.train_acc = metrics.Accuracy()
+        self.valid_acc = metrics.Accuracy(compute_on_step=False)
+
+    def forward(self, x):
+        return self.layers(x)
+
+    def training_step(self, batch, batch_idx):
+        x, y = batch
+        logits = self(x)
+        loss = F.cross_entropy(logits, y)
+        self.log('train loss', loss)
+        self.log('train accuracy', self.train_acc(logits, y))
+        self.train_acc.reset()
+        return loss
+
+    def validation_step(self, batch, batch_idx):
+        x, y = batch
+        logits = self(x)
+        loss = F.cross_entropy(logits, y)
+        self.log('valid loss', loss)
+        self.valid_acc(logits, y)
+        return loss
+
+    def validation_epoch_end(self, outputs):
+        self.log('valid accuracy', self.valid_acc.compute())
+        self.valid_acc.reset()
+
+    def configure_optimizers(self):
+        return torch.optim.AdamW(self.parameters(), lr=3e-4)
 
 
 class AutoEncoder(pl.LightningModule):
