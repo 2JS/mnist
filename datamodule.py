@@ -1,3 +1,5 @@
+import torch
+from torch import nn
 from torch.utils.data import DataLoader
 from torchvision import transforms as T
 from torchvision.datasets import CIFAR10
@@ -9,6 +11,13 @@ class CIFAR10DataModule(pl.LightningDataModule):
     ):
         super().__init__()
         self.data_dir = data_dir
+        self.train_transform = torch.jit.script(nn.Sequential(
+            T.ColorJitter(brightness=0.4, contrast=0.4, saturation=0.4, hue=0.2),
+            T.RandomGrayscale(p=0.1),
+            T.RandomHorizontalFlip(p=0.5),
+            T.RandomVerticalFlip(p=0.5),
+            T.RandomResizedCrop(size=(32,32)),
+        ))
 
     def prepare_data(self):
         CIFAR10(root=self.data_dir, train=True, download=True)
@@ -31,7 +40,7 @@ class CIFAR10DataModule(pl.LightningDataModule):
             return batch
         
         x = batch[0]
-        x = T.ColorJitter(brightness=0.4, contrast=0.4, saturation=0.4, hue=0.2)(x)
+        x = self.train_transform(x)
         batch[0] = x
         return batch
     
