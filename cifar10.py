@@ -1,22 +1,13 @@
 import os
 import numpy as np
 import torch
-from torch.utils.data import DataLoader
-import torchvision
-from torchvision.transforms import ToTensor
-from torchvision.datasets import CIFAR10
 import pytorch_lightning as pl
 from pytorch_lightning.loggers import WandbLogger
 
 from model import *
+from datamodule import CIFAR10DataModule
 
-train_dataset = CIFAR10(root='data/', train=True, download=True, transform=ToTensor()
-)
-test_dataset = CIFAR10(root='data/', train=False, download=True, transform=ToTensor()
-)
-
-train_dataloader = DataLoader(train_dataset, batch_size=2**7, shuffle=True)
-test_dataloader = DataLoader(test_dataset, batch_size=2**7)
+dm = CIFAR10DataModule()
 
 model = ConvClassifier()
 
@@ -29,4 +20,4 @@ trainer = pl.Trainer(
 )
 logger.watch(model)
 
-trainer.fit(model, train_dataloader, test_dataloader)
+trainer.fit(model, dm)
