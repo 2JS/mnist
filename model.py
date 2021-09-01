@@ -52,7 +52,15 @@ class ConvClassifier(pl.LightningModule):
     def __init__(self):
         super().__init__()
         self.layers = nn.Sequential(
-            nn.Conv2d(3, 64, kernel_size=3, stride=1, padding=1),
+            nn.Conv2d(3, 32, kernel_size=3, stride=1, padding=1),
+            nn.Dropout2d(p=0.1, inplace=True),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(32, 32, kernel_size=3, stride=1, padding=1),
+            nn.Dropout2d(p=0.1, inplace=True),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(kernel_size=2, stride=2),
+
+            nn.Conv2d(32, 64, kernel_size=3, stride=1, padding=1),
             nn.Dropout2d(p=0.1, inplace=True),
             nn.ReLU(inplace=True),
             nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=1),
@@ -68,16 +76,8 @@ class ConvClassifier(pl.LightningModule):
             nn.ReLU(inplace=True),
             nn.MaxPool2d(kernel_size=2, stride=2),
 
-            nn.Conv2d(128, 256, kernel_size=3, stride=1, padding=1),
-            nn.Dropout2d(p=0.1, inplace=True),
-            nn.ReLU(inplace=True),
-            nn.Conv2d(256, 256, kernel_size=3, stride=1, padding=1),
-            nn.Dropout2d(p=0.1, inplace=True),
-            nn.ReLU(inplace=True),
-            nn.MaxPool2d(kernel_size=2, stride=2),
-
             nn.Flatten(),
-            nn.Linear(4096, 512),
+            nn.Linear(2048, 512),
             nn.Dropout(p=0.1, inplace=True),
             nn.ReLU(inplace=True),
             nn.Linear(512, 10),
