@@ -31,7 +31,7 @@ class CIFAR10DataModule(pl.LightningDataModule):
             return batch
         
         x = batch[0]
-        x = T.ColorJitter(brightness=1, contrast=1, saturation=1, hue=0.2)(x)
+        x = T.ColorJitter(brightness=0.4, contrast=0.4, saturation=0.4, hue=0.2)(x)
         batch[0] = x
         return batch
     
