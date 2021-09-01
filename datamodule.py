@@ -21,7 +21,7 @@ class CIFAR10DataModule(pl.LightningDataModule):
         )
 
     def train_dataloader(self):
-        return DataLoader(self.train_dataset, batch_size=2**7, shuffle=True)
+        return DataLoader(self.train_dataset, batch_size=2**4, shuffle=True)
     
     def val_dataloader(self):
         return DataLoader(self.valid_dataset, batch_size=2**7)
