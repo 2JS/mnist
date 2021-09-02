@@ -4,6 +4,8 @@ import torch.nn.functional as F
 import torchmetrics as metrics
 import pytorch_lightning as pl
 
+from layers import *
+
 
 class Classifier(pl.LightningModule):
     def __init__(self):
@@ -87,6 +89,71 @@ class ConvClassifier(pl.LightningModule):
 
     def forward(self, x):
         return self.layers(x)
+
+    def training_step(self, batch, batch_idx):
+        x, y = batch
+        logits = self(x)
+        loss = F.cross_entropy(logits, y)
+        self.log('train loss', loss)
+        self.log('train accuracy', self.train_acc(logits, y))
+        self.train_acc.reset()
+        return loss
+
+    def validation_step(self, batch, batch_idx):
+        x, y = batch
+        logits = self(x)
+        loss = F.cross_entropy(logits, y)
+        self.log('valid loss', loss)
+        self.valid_acc(logits, y)
+        return loss
+
+    def validation_epoch_end(self, outputs):
+        self.log('valid accuracy', self.valid_acc.compute())
+        self.valid_acc.reset()
+
+    def configure_optimizers(self):
+        return torch.optim.AdamW(self.parameters(), lr=3e-4)
+
+class MLPMixerClassifier(pl.LightningModule):
+    def __init__(
+        self,
+        seq_len=100,
+        in_channels=5,
+        num_features=32,
+        expansion_factor=2,
+        num_layers=3,
+        num_classes=2,
+        dropout=0.1,
+    ):
+        super().__init__()
+
+        self.conv = nn.Conv2d(in_channels, num_features, kernel_size=7, padding=3)
+        self.mixers = nn.Sequential(
+            *[
+                MixerLayer(
+                    seq_len=seq_len,
+                    num_features=num_features,
+                    d_c=expansion_factor*seq_len,
+                    d_s=expansion_factor*num_features,
+                    dropout=dropout,
+                )
+                for _ in range(num_layers)
+            ]
+        )
+        self.fc = nn.Linear(seq_len*num_features, num_classes)
+
+        self.train_acc = metrics.Accuracy()
+        self.valid_acc = metrics.Accuracy(compute_on_step=False)
+
+    def forward(self, x):
+        x = self.conv(x)
+        x = x.flatten(2, 3)
+        x = x.permute(0, 2, 1)
+        x = self.mixers(x)
+        x = x.view(x.shape[0], -1)
+        x = self.fc(x)
+
+        return x
 
     def training_step(self, batch, batch_idx):
         x, y = batch

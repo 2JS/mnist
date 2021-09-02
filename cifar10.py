@@ -9,7 +9,7 @@ from datamodule import CIFAR10DataModule
 
 dm = CIFAR10DataModule()
 
-model = ConvClassifier()
+model = MLPMixerClassifier(seq_len=32*32, in_channels=3, num_features=128, num_layers=5, num_classes=10)
 
 logger = WandbLogger(project='cifar10', log_model='all')
 
