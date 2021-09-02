@@ -14,8 +14,8 @@ model = resnet50()
 logger = WandbLogger(project='cifar10', log_model='all')
 
 trainer = pl.Trainer(
-    max_epochs=10,
-    # gpus=-1,
+    max_epochs=100,
+    gpus=-1,
     logger=logger,
 )
 logger.watch(model)
