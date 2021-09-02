@@ -1,3 +1,4 @@
+import os
 import torch
 from torch import nn
 from torch.utils.data import DataLoader
@@ -30,10 +31,10 @@ class CIFAR10DataModule(pl.LightningDataModule):
         )
 
     def train_dataloader(self):
-        return DataLoader(self.train_dataset, batch_size=2**4, shuffle=True, num_workers=os.cpu_count())
+        return DataLoader(self.train_dataset, batch_size=2**4, shuffle=True)
     
     def val_dataloader(self):
-        return DataLoader(self.valid_dataset, batch_size=2**7, num_workers=os.cpu_count())
+        return DataLoader(self.valid_dataset, batch_size=2**7)
     
     def on_after_batch_transfer(self, batch, dataloader_idx):
         if not self.trainer.training:
