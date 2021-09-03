@@ -13,11 +13,11 @@ class CIFAR10DataModule(pl.LightningDataModule):
         super().__init__()
         self.data_dir = data_dir
         self.train_transform = torch.jit.script(nn.Sequential(
-            # T.ColorJitter(brightness=0.4, contrast=0.6, saturation=0.6, hue=0.05),
+            T.ColorJitter(brightness=0.4, contrast=0.6, saturation=0.6, hue=0.05),
             T.RandomGrayscale(p=0.1),
             T.RandomHorizontalFlip(p=0.5),
             # T.RandomVerticalFlip(p=0.5),
-            # T.RandomResizedCrop(size=(32,32), scale=(0.8,1.0)),
+            T.RandomResizedCrop(size=(32,32), scale=(0.7,1.0)),
         ))
 
     def setup(self, stage = None):
