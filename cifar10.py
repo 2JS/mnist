@@ -11,7 +11,7 @@ from datamodule import CIFAR10DataModule
 if __name__=='__main__':
     dm = CIFAR10DataModule()
 
-    model = resnet34()
+    model = ConvClassifier()
 
     logger = WandbLogger(project='cifar10', log_model=True)
 
