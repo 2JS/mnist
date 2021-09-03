@@ -20,14 +20,10 @@ class CIFAR10DataModule(pl.LightningDataModule):
             T.RandomResizedCrop(size=(32,32), scale=(0.5,1.0)),
         ))
 
-    def prepare_data(self):
-        CIFAR10(root=self.data_dir, train=True, download=True)
-        CIFAR10(root=self.data_dir, train=False, download=True)
-
     def setup(self, stage = None):
-        self.train_dataset = CIFAR10(root='data/', train=True, download=True, transform=T.ToTensor()
+        self.train_dataset = CIFAR10(root=self.data_dir, train=True, download=True, transform=T.ToTensor()
         )
-        self.valid_dataset = CIFAR10(root='data/', train=False, download=True, transform=T.ToTensor()
+        self.valid_dataset = CIFAR10(root=self.data_dir, train=False, download=True, transform=T.ToTensor()
         )
 
     def train_dataloader(self):
