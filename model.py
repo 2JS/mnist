@@ -57,7 +57,7 @@ class ConvClassifier(pl.LightningModule):
             nn.BatchNorm2d(num_features=64),
             nn.ReLU(inplace=True),
             nn.Conv2d(64, 128, kernel_size=3, stride=1, padding=1),
-            nn.BatchNorm2d(num_features=64),
+            nn.BatchNorm2d(num_features=128),
             nn.ReLU(inplace=True),
             nn.MaxPool2d(kernel_size=2, stride=2),
 
@@ -65,7 +65,7 @@ class ConvClassifier(pl.LightningModule):
             nn.BatchNorm2d(num_features=128),
             nn.ReLU(inplace=True),
             nn.Conv2d(128, 256, kernel_size=3, stride=1, padding=1),
-            nn.BatchNorm2d(num_features=64),
+            nn.BatchNorm2d(num_features=256),
             nn.ReLU(inplace=True),
             nn.MaxPool2d(kernel_size=2, stride=2),
 
@@ -73,7 +73,7 @@ class ConvClassifier(pl.LightningModule):
             nn.BatchNorm2d(num_features=256),
             nn.ReLU(inplace=True),
             nn.Conv2d(256, 512, kernel_size=3, stride=1, padding=1),
-            nn.BatchNorm2d(num_features=64),
+            nn.BatchNorm2d(num_features=512),
             nn.ReLU(inplace=True),
             nn.MaxPool2d(kernel_size=2, stride=2),
 
