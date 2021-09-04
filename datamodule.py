@@ -30,10 +30,10 @@ class CIFAR10DataModule(pl.LightningDataModule):
         )
 
     def train_dataloader(self):
-        return DataLoader(self.train_dataset, batch_size=2**7, shuffle=True)
+        return DataLoader(self.train_dataset, batch_size=2**7, num_workers=os.cpu_count(), shuffle=True)
     
     def val_dataloader(self):
-        return DataLoader(self.valid_dataset, batch_size=2**7)
+        return DataLoader(self.valid_dataset, batch_size=2**7, num_workers=os.cpu_count())
 
     def on_after_batch_transfer(self, batch, dataloader_idx):
         if not self.trainer.training:
