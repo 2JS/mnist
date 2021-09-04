@@ -13,11 +13,13 @@ class CIFAR10DataModule(pl.LightningDataModule):
         super().__init__()
         self.data_dir = data_dir
         self.train_transform = torch.jit.script(nn.Sequential(
-            T.ColorJitter(brightness=0.4, contrast=0.6, saturation=0.6, hue=0.05),
-            T.RandomGrayscale(p=0.1),
+            # T.ColorJitter(brightness=0.4, contrast=0.6, saturation=0.6, hue=0.05),
+            # T.RandomGrayscale(p=0.1),
             T.RandomHorizontalFlip(p=0.5),
             # T.RandomVerticalFlip(p=0.5),
-            T.RandomResizedCrop(size=(32,32), scale=(0.7,1.0)),
+            # T.RandomResizedCrop(size=(32,32), scale=(0.7,1.0)),
+            # T.RandomAffine(degrees=(-45, 45), translate=(0.1, 0.1), scale=(0.9, 1.2)),
+            T.AutoAugment(T.AutoAugmentPolicy.IMAGENET),
         ))
 
     def setup(self, stage = None):
@@ -27,17 +29,18 @@ class CIFAR10DataModule(pl.LightningDataModule):
         )
 
     def train_dataloader(self):
-        return DataLoader(self.train_dataset, batch_size=2**7, num_workers=os.cpu_count(), shuffle=True)
+        return DataLoader(self.train_dataset, batch_size=2**7, shuffle=True)
     
     def val_dataloader(self):
-        return DataLoader(self.valid_dataset, batch_size=2**7, num_workers=os.cpu_count())
+        return DataLoader(self.valid_dataset, batch_size=2**7)
 
     def on_after_batch_transfer(self, batch, dataloader_idx):
         if not self.trainer.training:
             return batch
-        
-        x = batch[0]
+
+        x, y = batch
+        x = (x * 255).to(torch.uint8)
         x = self.train_transform(x)
-        batch[0] = x
-        return batch
+        x = x.to(torch.float32) / 255
+        return x, y
     
