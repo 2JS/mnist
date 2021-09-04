@@ -16,7 +16,7 @@ if __name__=='__main__':
     logger = WandbLogger(project='cifar10', log_model=True)
 
     trainer = pl.Trainer(
-        max_epochs=100,
+        max_epochs=200,
         gpus=-1,
         logger=logger,
     )
