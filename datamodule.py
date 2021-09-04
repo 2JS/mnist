@@ -13,14 +13,20 @@ class CIFAR10DataModule(pl.LightningDataModule):
         super().__init__()
         self.data_dir = data_dir
         self.train_transform = torch.jit.script(nn.Sequential(
-            T.ColorJitter(brightness=0.4, contrast=0.6, saturation=0.6, hue=0.05),
-            T.RandomGrayscale(p=0.1),
             T.RandomHorizontalFlip(p=0.5),
             # T.RandomVerticalFlip(p=0.5),
-            T.RandomResizedCrop(size=(32,32), scale=(0.7,1.0)),
-            T.RandomAffine(degrees=(-30, 30), translate=(0.1, 0.1), scale=(0.9, 1.2)),
-            # T.AutoAugment(T.AutoAugmentPolicy.IMAGENET),
-            # T.AutoAugment(T.AutoAugmentPolicy.CIFAR10),
+            T.RandomApply(nn.ModuleList([
+                T.ColorJitter(brightness=0.4, contrast=0.6, saturation=0.6, hue=0.05),
+                T.RandomGrayscale(p=0.1),
+                T.RandomResizedCrop(size=(32,32), scale=(0.7,1.0)),
+                T.RandomAffine(degrees=(-30, 30), translate=(0.1, 0.1), scale=(0.9, 1.2)),
+            ]), p=0.4),
+            T.RandomApply(nn.ModuleList([
+                T.AutoAugment(T.AutoAugmentPolicy.CIFAR10),
+            ]), p=0.3),
+            T.RandomApply(nn.ModuleList([
+                T.AutoAugment(T.AutoAugmentPolicy.IMAGENET),
+            ]), p=0.3),
         ))
 
     def setup(self, stage = None):
@@ -40,8 +46,8 @@ class CIFAR10DataModule(pl.LightningDataModule):
             return batch
 
         x, y = batch
-        # x = (x * 255).to(torch.uint8)
+        x = (x * 255).to(torch.uint8)
         x = self.train_transform(x)
-        # x = x.to(torch.float32) / 255
+        x = x.to(torch.float32) / 255
         return x, y
     
