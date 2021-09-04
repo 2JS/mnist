@@ -9,6 +9,8 @@ from model import *
 from datamodule import CIFAR10DataModule
 
 if __name__=='__main__':
+    pl.seed_everything(0)
+
     dm = CIFAR10DataModule()
 
     model = ConvClassifier()
