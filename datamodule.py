@@ -19,7 +19,7 @@ class CIFAR10DataModule(pl.LightningDataModule):
             # T.RandomVerticalFlip(p=0.5),
             # T.RandomResizedCrop(size=(32,32), scale=(0.7,1.0)),
             # T.RandomAffine(degrees=(-45, 45), translate=(0.1, 0.1), scale=(0.9, 1.2)),
-            T.AutoAugment(T.AutoAugmentPolicy.IMAGENET),
+            T.AutoAugment(T.AutoAugmentPolicy.CIFAR10),
         ))
 
     def setup(self, stage = None):
