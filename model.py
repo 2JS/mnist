@@ -120,7 +120,7 @@ class ConvClassifier(pl.LightningModule):
         self.valid_acc.reset()
 
     def configure_optimizers(self):
-        return torch.optim.AdamW(self.parameters(), lr=3e-4)
+        return torch.optim.AdamW(self.parameters(), lr=3e-5)
 
 class MLPMixerClassifier(pl.LightningModule):
     def __init__(
